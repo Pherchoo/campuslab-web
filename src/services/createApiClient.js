@@ -1,6 +1,11 @@
 // Cliente HTTP base compartido por las dos aplicaciones.
 // No realiza peticiones hasta que el docente proporcione la configuración.
+/** @param {{apiUrl: string, appToken: string}} config */
 export function createApiClient(config) {
+  /**
+   * @param {string} path
+   * @param {RequestInit & {token?: string | null, onUnauthorized?: () => void | Promise<void>, onForbidden?: () => void | Promise<void>}} [options]
+   */
   return async function apiFetch(path, {
     token = null, onUnauthorized, onForbidden, headers = {}, ...options
   } = {}) {
@@ -21,8 +26,7 @@ export function createApiClient(config) {
     if (response.status === 401) await onUnauthorized?.();
     if (response.status === 403) await onForbidden?.();
     if (!response.ok) {
-      const error = new Error(`Error HTTP ${response.status}`);
-      error.status = response.status;
+      const error = Object.assign(new Error(`Error HTTP ${response.status}`), { status: response.status });
       throw error;
     }
     if (response.status === 204) return null;
