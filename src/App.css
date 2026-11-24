@@ -1,0 +1,7 @@
+.base-card { max-width: 540px; margin: 14vh auto; padding: 36px; border: 1px solid #e5e5ea; border-radius: 12px; background: white; }
+.brand { color: #6d8196; font-weight: 700; }
+h1 { font-size: 28px; letter-spacing: -1px; }
+p { line-height: 1.7; }
+.status { background: #6d8196; color: white; border-radius: 8px; padding: 12px 16px; margin: 24px 0; }
+.note { color: #86868b; }
+@media (max-width: 600px) { .base-card { margin: 32px 16px; padding: 24px; } }
