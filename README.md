@@ -1,50 +1,52 @@
 # CampusLab Web
 
-Proyecto C del proyecto integrador de IDGS de la Universidad Tecnológica El Retoño. Sistema de Control de Laboratorios de Cómputo.
+Proyecto C · equipo-c2 · IDGS, Universidad Tecnológica El Retoño.
 
-## Estado del avance
+## Avance del 25 de noviembre de 2026
 
-Base inicial en React JS con Vite, estructura modular, GitFlow y configuración de variables de entorno. La API todavía está pendiente de los datos del docente. Esta entrega no representa la aplicación final ni incluye autenticación funcional.
+Módulo Auth y vistas de usuario: Login, Registro con matrícula, laboratorio y disponibilidad de PCs (C1), asignación por materia y horas (C2), sesión propia y liberación con reporte de falla opcional (C3). Las pantallas siguen el diseño CampusLab aprobado. Los datos se obtienen de la API del docente.
 
-## Instalación
+El panel administrativo C4 corresponde al siguiente hito (26 al 30 de noviembre). Una cuenta ADMIN puede iniciar sesión en este avance y utilizar su sesión propia; aún no se incluyen altas de equipos, liberación de otros usuarios ni cambios de roles.
 
-```bash
+## API y seguridad
+
+API: https://proyecto-idgs9-v1.onrender.com
+Documentación: https://proyecto-idgs9-v1.onrender.com/api/docs/
+
+Copiar `.env.example` a `.env` y completar el token de equipo entregado por el profesor. El `.env` local ya está configurado en la computadora de trabajo y está excluido de Git. No se guardan contraseñas en archivos fuente. El token de aplicación de Vite/Expo es visible en el cliente compilado, según el contrato de la clase; no es una clave de servidor.
+
+Cada petición incluye `x-api-token`; las solicitudes protegidas agregan `Authorization: Bearer <JWT de usuario>`. El registro siempre crea un USER. Ante 401 se borra la sesión y vuelve el Login; ante 403 se muestra una alerta de acceso restringido. Un fallo temporal de red al restaurar el acceso permite reintentar sin perder el token. Se valida la sesión con `/api/auth/me`.
+
+## Flujo de prueba
+
+1. Iniciar sesión con las credenciales que entregó el profesor (no se publican en el repositorio).
+2. Seleccionar Lab-A, Lab-B o Redes y revisar las estaciones y sus estados.
+3. Seleccionar una PC disponible; indicar materia y entre 0.5 y 12 horas.
+4. Revisar Mi sesión activa y liberar el equipo al terminar. Si se marca una falla, describirla con al menos 5 caracteres.
+5. Cerrar sesión y comprobar que no sea posible acceder a las vistas protegidas.
+
+Las pruebas contra la API generan registros reales de asignación. Usar una PC disponible y liberarla después. No liberar sesiones de otras personas. `npm test` usa respuestas simuladas y no modifica la API.
+
+## Organización y GitFlow
+
+`src/components`, `src/context`, `src/services`, `src/config` y `src/utils` separan presentación, estado y HTTP. Se usan formularios controlados, indicadores de carga, validación y bloqueo de doble envío.
+
+Rama de este avance: `feature/auth-usuario`, basada en `develop`. Integración mediante Pull Request hacia `develop`; `main` se reserva para la versión final. Ver `docs/GITFLOW.md`.
+
+## Ejecutar en Windows
+
+```powershell
 npm install
-```
-
-Copiar `.env.example` como `.env` y completar `VITE_API_URL` y `VITE_API_APP_TOKEN` cuando el docente los proporcione. Los valores vacíos son intencionales. Ambas aplicaciones consumirán la misma API REST.
-
-```bash
 npm run dev
 ```
 
-Para compilar: `npm run build`.
+Abrir la URL que imprime Vite (habitualmente http://localhost:5173). Navegación con React Router DOM y sesión en localStorage. Rutas: `/login`, `/registro`, `/laboratorios` y `/mi-sesion`.
 
-## Organización
-
-```text
-src/
-  components/
-  pages/
-  services/
-  context/
-  config/
-  utils/
+```powershell
+npm test
+npm run lint
+npm run build
+npm run preview
 ```
 
-## Entorno y seguridad
-
-`VITE_API_APP_TOKEN` se enviará como `x-api-token`. El JWT de usuario se recibirá al iniciar sesión y se enviará como `Authorization: Bearer <token>`; no se almacena en `.env`. El cliente base permite callbacks para limpiar la sesión ante 401 y mostrar acceso restringido ante 403; las pantallas de autenticación y su almacenamiento se implementarán después.
-
-Las variables con prefijos VITE_ y EXPO_PUBLIC_ son visibles en el cliente compilado. No colocar contraseñas ni claves privadas en ellas. Se sigue el contrato de token de aplicación del documento de clase.
-
-`.env` está excluido de Git; `.env.example` sí se versiona.
-
-## GitFlow
-
-Ver `docs/GITFLOW.md`. Se preparan main, develop, feature/base-entorno y fix/ajustes.
-
-## Próximas etapas
-
-Login y Registro, laboratorios y PCs, asignación y liberación con reporte de falla, panel administrativo y permisos por rol.
-Navegación protegida mediante React Router y despliegue de la SPA.
+El despliegue público y sus reescrituras SPA se prepararán en el hito final. El servidor de desarrollo ya permite recargar directamente las rutas.
